@@ -1,0 +1,167 @@
+Find Index:
+
+GET /movies/_search
+GET /my_movies/_search
+GET /index_tests/_search
+
+GET /movies/_doc/_search
+{
+  "query": {  
+    "multi_match": {
+	"query":"Red",
+	"fields": ["title","director"]
+	  }
+  }       
+}
+
+GET contacts/_search
+{
+  "query": {
+    "exists": {
+      "field":"firstName"}
+  }
+}
+
+SORT:
+GET /my_movies/_search
+{
+  "sort":[{"year":{"order":"desc"}}]
+}
+GET /my_movies/_search
+{
+  "sort":[{"year":{"order":"desc"}}],
+  "query":{"term":{"stars":"five"}}
+}
+
+DELETE /my_movies
+
+Create Index:
+
+PUT movies
+{
+  "mappings": { 
+      "properties": {
+        "title" : { "type" : "text" },
+        "year": {"type" : "text"},
+        "director": {"type": "text"},
+        "stars": {"type": "text"}
+      }
+  }
+}
+
+MATCH_ALL QUERIES
+
+POST /movies/_doc/_search
+{
+  "query": {  
+    "match_all": {}
+  }       
+}
+
+PUT my_movies
+{
+  "mappings": { 
+      "properties": {
+        "title" : { "type" : "text" },
+        "year": {"type" : "date", "format":"mm-dd-yyyy"},
+        "director": {"type": "text"},
+        "stars": {"type": "text"}
+      }
+  }
+}
+
+PUT /index_tests/type_test/1
+{
+  "name":"Anthony Duke",
+  "subject":"Math",
+  "date":"2021-05-12"
+}
+
+Use Bulk for Movie Index
+
+POST /_bulk 
+{"index":{"_index":"movies", "_type":"_doc", "_id": "1"}}
+{"title":"Red", "year":"2021-12-09", "director":"Unknow", "starts":"five"}
+{"index":{"_index":"movies", "_type":"movie", "_id": "2"}}
+{"title":"POTC", "year":"2020-21-02", "director":"Unknow", "starts":"five"}
+
+MY_MOVIES INDEX:
+
+POST /_bulk 
+{"index":{"_index":"my_movies", "_type":"_doc", "_id": "1"}}
+{"title":"Snow White", "year": "09-02-2021", "director":"Matt Luck", "stars":"five"}
+{"index":{"_index":"my_movies", "_type":"_doc", "_id": "2"}}
+{"title":"Lion King", "year": "09-02-2021", "director":"River Sr", "stars":"four"}
+{"index":{"_index":"my_movies", "_type":"_doc", "_id": "3"}}
+{"title":"The Wolf on Wall Street", "year": "12-10-2020", "director":"Unknow", "stars":"two"}
+{"index":{"_index":"my_movies", "_type":"_doc", "_id": "4"}}
+{"title":"The Wolf", "year": "08-02-2021", "director":"Unknow", "stars":"three"}
+
+
+UPDATE data:
+
+POST /index_tests/type_test/1/_update
+{
+  "doc": {
+    "name":"Martha Duke",
+  "subject":"Science",
+  "date":"2021-01-01",
+  "company": "NA"
+  }
+}
+
+
+TERM_LEVEL_QUERIES:
+EXISTS queries: return documents with minimum of one non-null in field
+POST /movies/_search
+{
+  "query": {
+    "exists": {"field":"title"}
+  }
+}
+
+RANGE queries: find objects which have a value that exists between a range of values.
+parameters are: 
+gte => greater then or equal to
+gt => greater then
+lte => less then or equal to
+lt=> less then
+
+POST /movies/_search
+{
+  "query": {
+    "range": {"starts":{"gte": 5}}
+  }
+}
+
+Query Context :Matches Documents and Calculates a_score
+
+Filter Context: seeks yes or no answer to weather a document matches
+
+GET /_search
+{
+  "query": { 
+    "bool": { 
+      "must": [
+        { "match": { "firstName":   "Matt"        }},
+        { "match": { "lastName": "Zuluaga" }}
+      ],
+      "filter": [ 
+        { "term":  { "email": "matt@gmail.com" }},
+        { "range": { "id": { "gte": "15" }}}
+      ]
+    }
+  }
+}
+
+*The bool and two match clauses are used in query context, which means that they are used to score how well each document matches.
+*	
+The filter parameter indicates filter context. Its term and range clauses are used in filter context. They will filter out documents which do not match, but they will not affect the score for matching documents.
+
+*Metric Aggregation:
+Calculates the avg numeric value over a given numeric field in a document.
+
+Geo Searching:
+Running location based queries with geo data
+
+
